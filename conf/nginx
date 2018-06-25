@@ -1,0 +1,85 @@
+upstream api {
+  server api:8666;
+}
+
+upstream marketplace {
+  server marketplace:3000;
+}
+
+server {
+  listen         80 default_server;
+  server_name    _ 18.188.7.241 staging.portalsolar.com.br portalsolar.jurema.la;
+  client_max_body_size 20M;
+  root /wordpress;
+
+	error_log /dev/stdout info;
+	access_log /dev/stdout;
+
+  index index.php index.html index.htm;
+
+  location @institucional {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_pass http://institucional;
+  }
+
+  location @marketplace {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect   off;
+    proxy_pass       http://marketplace;
+  }
+
+  location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_pass php:9000;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param PATH_INFO $fastcgi_path_info;
+    fastcgi_intercept_errors on;
+    include fastcgi.conf;
+  }
+
+  location ~ (^/(api|admin|financiamento|fornecedores|calculo-solar|login|logout|dashboard|meus-dados|users|projetos)) {
+    root /institucional;
+    try_files $uri @institucional;
+  }
+
+  location ~ ^/loja {
+    root /marketplace;
+    try_files $uri @marketplace;
+  }
+
+  location ~ ^/(assets|system)/ {
+    root /institucional;
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+    try_files $uri @institucional;
+  }
+
+  location ~ ^/loja/(assets|system)/ {
+    root /marketplace;
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+    try_files $uri @marketplace;
+  }
+
+  location '/.well-known/acme-challenge' {
+    default_type 'text/plain';
+  }
+
+  location ~ /\. {
+    deny all;
+  }
+
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  error_page 500 502 503 504 /500.html;
+  keepalive_timeout 10;
+}

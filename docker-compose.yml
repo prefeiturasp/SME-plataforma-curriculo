@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  interface:
+    build: ./interface
+    container_name: interface
+    working_dir: /app
+    ports:
+      - 5000:5000  
+    volumes:
+      - ./interface:/app      
+    env_file: .env.interface
+    stdin_open: true
+    tty: true
+
+  api:
+    build: ./api
+    working_dir: /app
+    env_file:
+      - ./.env.postgresql
+      - ./.env.api
+    command: puma -v -C config/puma.rb
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./api:/app
+    ports:
+      - 8666:8666
+    links:
+      - postgresql
+    depends_on:
+      - postgresql
+
+  postgresql:
+    image: mdillon/postgis:10-alpine
+    ports:
+      - 5432:5432
+    env_file: .env.postgresql
+    volumes:
+      - postgresql_data:/var/lib/postgresqlql/data
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./conf/nginx:/etc/nginx/conf.d/default.conf
+      - ./conf/fastcgi.conf:/etc/nginx/fastcgi.conf
+      - ./api/public:/api
+    command: [nginx-debug, '-g', 'daemon off;']
+    depends_on:
+      - api
+      - interface
+    links:
+      - api
+      - interface
+
+volumes:
+  postgresql_data:
