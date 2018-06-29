@@ -4,7 +4,7 @@ node('master') {
         if (!fileExists('SME-plataforma-curriculo')) {
             sh 'git clone --recurse-submodules -j8 -b staging git@github.com:prefeiturasp/SME-plataforma-curriculo.git'
         }
-        sh 'cd SME-plataforma-curriculo && git checkout staging && git pull'
+        sh 'cd SME-plataforma-curriculo && git checkout jenkins && git pull'
     }
     dir('SME-plataforma-curriculo') {
         stage('Git checkout interface'){
