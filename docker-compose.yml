@@ -37,7 +37,7 @@ services:
       - 5432:5432
     env_file: .env.postgresql
     volumes:
-      - postgresql_data:/var/lib/postgresqlql/data
+      - postgresql_data:/var/lib/postgresql/data
 
   nginx:
     image: nginx:latest
