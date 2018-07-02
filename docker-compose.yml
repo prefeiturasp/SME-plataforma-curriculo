@@ -9,7 +9,7 @@ services:
       - 5000:5000  
     volumes:
       - ${APP_ROOT}/interface:/app      
-    env_file: .env.interface
+    env_file: ${APP_ROOT}/.env.interface
     stdin_open: true
     tty: true
 
