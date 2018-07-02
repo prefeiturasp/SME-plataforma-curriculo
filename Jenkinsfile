@@ -27,8 +27,8 @@ node('master') {
         stage('Build docker nginx'){
             sh 'docker-compose build nginx'
         }
-        stage('Up nginx docker'){
-            sh 'docker-compose up nginx'
+        stage('Up docker containers'){
+            sh 'docker-compose up -d'
         }
 
     }
