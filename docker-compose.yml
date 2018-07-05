@@ -2,7 +2,10 @@ version: '3'
 
 services:
   interface:
-    build: ${APP_ROOT}/interface
+    build: 
+      context: ${APP_ROOT}/interface
+      args:
+        - APP_ROOT=${APP_ROOT}
     container_name: interface
     working_dir: /app
     ports:
@@ -40,21 +43,21 @@ services:
       - postgresql_data:/var/lib/postgresql/data
 
   nginx:
-    image: nginx:latest
-    ports:
-      - 80:80
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ${APP_ROOT}/conf/nginx:/etc/nginx.conf/conf.d/default.conf
-      - ${APP_ROOT}/conf/fastcgi.conf:/etc/nginx/fastcgi.conf
-      - ${APP_ROOT}/api/public:/api
-    command: [nginx-debug, '-g', 'daemon off;']
-    depends_on:
-      - api
-      - interface
-    links:
-      - api
-      - interface
+      image: nginx:latest
+      ports:
+        - 80:80
+      volumes:
+        - /var/run/docker.sock:/tmp/docker.sock:ro
+        - ${APP_ROOT}/conf/nginx:/etc/nginx/conf.d/default.conf
+        - ${APP_ROOT}/conf/fastcgi.conf:/etc/nginx/fastcgi.conf
+        - ${APP_ROOT}/api/public:/api
+      command: [nginx-debug, '-g', 'daemon off;']
+      depends_on:
+        - api
+        - interface
+      links:
+        - api
+        - interface
 
 volumes:
   postgresql_data:

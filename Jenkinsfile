@@ -1,17 +1,22 @@
 def project_name = "SME-plataforma-curriculo"
 node('master') {
-    stage('Git checkout master') {
-        if (!fileExists('SME-plataforma-curriculo')) {
-            sh 'git clone --recurse-submodules -j8 -b staging git@github.com:prefeiturasp/SME-plataforma-curriculo.git'
+    dir("${env.APP_ROOT}") {
+        stage('Git checkout master') {
+
+            sh 'git checkout jenkins && git pull'
         }
-        sh 'cd SME-plataforma-curriculo && git checkout jenkins && git pull'
-    }
-    dir('SME-plataforma-curriculo') {
         stage('Git checkout interface'){
             sh 'cd interface && git checkout staging && git pull'
         }
+        stage('Set API URL'){
+            echo "${env.API_URL}"
+            sh "echo 'export const API_URL = $API_URL;' > interface/src/constants.js"
+        }
         stage('Git checkout api'){
             sh 'cd api && git checkout docker-new-setup && git pull'
+        }
+        stage('Stop containers'){
+            sh 'docker-compose stop && yes y | docker-compose rm'
         }
         stage('Build docker interface'){
             echo pwd()
@@ -30,6 +35,8 @@ node('master') {
         stage('Up docker containers'){
             sh 'docker-compose up -d'
         }
-
+        stage('Run migrations'){
+            sh 'docker-compose exec -T api bundle exec rake db:migrate'
+        }
     }
 }
