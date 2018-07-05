@@ -10,7 +10,7 @@ node('master') {
         }
         stage('Set API URL'){
             echo "${env.API_URL}"
-            sh "echo 'export const API_URL = $API_URL;' > interface/src/constants.js"
+            sh "echo 'export const API_URL = \'$API_URL;\'' > interface/src/constants.js"
         }
         stage('Git checkout api'){
             sh 'cd api && git checkout docker-new-setup && git pull'
@@ -19,8 +19,6 @@ node('master') {
             sh 'docker-compose stop && yes y | docker-compose rm'
         }
         stage('Build docker interface'){
-            echo pwd()
-            sh 'cp -r /tmp/env/. .' 
             sh 'docker-compose build interface'
         }
         stage('Build docker postgresql'){

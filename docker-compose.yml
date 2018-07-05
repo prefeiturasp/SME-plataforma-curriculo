@@ -48,7 +48,7 @@ services:
         - 80:80
       volumes:
         - /var/run/docker.sock:/tmp/docker.sock:ro
-        - ${APP_ROOT}/conf/nginx:/etc/nginx/conf.d/default.conf
+        - ${APP_ROOT}/conf/nginx.conf:/etc/nginx/conf.d/default.conf
         - ${APP_ROOT}/conf/fastcgi.conf:/etc/nginx/fastcgi.conf
         - ${APP_ROOT}/api/public:/api
       command: [nginx-debug, '-g', 'daemon off;']
