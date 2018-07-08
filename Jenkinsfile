@@ -2,15 +2,13 @@ def project_name = "SME-plataforma-curriculo"
 node('master') {
     dir("${env.APP_ROOT}") {
         stage('Git checkout master') {
-
-            sh 'git checkout jenkins && git pull'
+            sh 'git checkout staging && git pull'
         }
         stage('Git checkout interface'){
             sh 'cd interface && git checkout staging && git pull'
         }
         stage('Set API URL'){
-            echo "${env.API_URL}"
-            sh "echo 'export const API_URL = \'$API_URL;\'' > interface/src/constants.js"
+            sh 'echo "export const API_URL = \'$API_URL\'" > interface/src/constants.js'
         }
         stage('Git checkout api'){
             sh 'cd api && git checkout docker-new-setup && git pull'
