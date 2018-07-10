@@ -15,6 +15,7 @@ services:
     env_file: ${APP_ROOT}/.env.interface
     stdin_open: true
     tty: true
+    restart: always
 
   api:
     build: ${APP_ROOT}/api
@@ -33,6 +34,7 @@ services:
       - postgresql
     depends_on:
       - postgresql
+    restart: always
 
   postgresql:
     image: mdillon/postgis:10-alpine
@@ -41,6 +43,7 @@ services:
     env_file: ${APP_ROOT}/.env.postgresql
     volumes:
       - postgresql_data:/var/lib/postgresql/data
+    restart: always
 
   nginx:
       image: nginx:latest
@@ -58,6 +61,7 @@ services:
       links:
         - api
         - interface
+      restart: always
 
 volumes:
   postgresql_data:
