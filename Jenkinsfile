@@ -5,13 +5,13 @@ node('master') {
             sh 'git checkout staging && git pull'
         }
         stage('Git checkout interface'){
-            sh 'cd interface && git checkout staging && git pull'
+            sh 'cd interface && git reset --hard && git checkout staging && git pull'
         }
         stage('Set API URL'){
             sh 'echo "export const API_URL = \'$API_URL\'" > interface/src/constants.js'
         }
         stage('Git checkout api'){
-            sh 'cd api && git checkout docker-new-setup && git pull'
+            sh 'cd api && git checkout staging && git pull'
         }
         stage('Stop containers'){
             sh 'docker-compose stop && yes y | docker-compose rm'
