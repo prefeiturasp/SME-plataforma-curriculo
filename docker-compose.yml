@@ -29,6 +29,7 @@ services:
     tty: true
     volumes:
       - ${APP_ROOT}/api:/app
+      - api_storage:/app/storage
     ports:
       - 8666
     links:
@@ -67,3 +68,4 @@ services:
 
 volumes:
   postgresql_data:
+  api_storage:
