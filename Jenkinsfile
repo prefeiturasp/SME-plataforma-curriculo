@@ -13,9 +13,6 @@ node('master') {
         stage('Git checkout api'){
             sh 'cd api && git checkout staging && git pull'
         }
-        stage('Stop containers'){
-            sh 'docker-compose stop && yes y | docker-compose rm'
-        }
         stage('Build docker interface'){
             sh 'docker-compose build interface'
         }
@@ -29,7 +26,7 @@ node('master') {
             sh 'docker-compose build nginx'
         }
         stage('Up docker containers'){
-            sh 'docker-compose up -d'
+            sh 'docker-compose restart'
         }
         stage('Run migrations'){
             sh 'docker-compose exec -T api bundle exec rake db:migrate'
