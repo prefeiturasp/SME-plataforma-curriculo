@@ -10,7 +10,7 @@ services:
     container_name: interface
     working_dir: /app
     ports:
-      - 5000:5000  
+      - 5000  
     volumes:
       - ${APP_ROOT}/interface:/app      
     env_file: ${APP_ROOT}/.env.interface
@@ -30,7 +30,7 @@ services:
     volumes:
       - ${APP_ROOT}/api:/app
     ports:
-      - 8666:8666
+      - 8666
     links:
       - postgresql
     depends_on:
@@ -40,10 +40,11 @@ services:
   postgresql:
     image: mdillon/postgis:10-alpine
     ports:
-      - 5432:5432
+      - 5432
     env_file: ${APP_ROOT}/.env.postgresql
     volumes:
       - postgresql_data:/var/lib/postgresql/data
+      - ${APP_ROOT}/conf/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
     restart: always
 
   nginx:

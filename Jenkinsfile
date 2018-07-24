@@ -31,6 +31,9 @@ node('master') {
         stage('Up docker containers'){
             sh 'docker-compose up -d'
         }
+        stage('Run tests'){
+            sh 'docker-compose exec -e RAILS_ENV=test api rspec spec'
+        }
         stage('Run migrations'){
             sh 'docker-compose exec -T api bundle exec rake db:migrate'
         }
