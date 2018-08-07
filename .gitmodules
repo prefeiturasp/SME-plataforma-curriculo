@@ -1,0 +1,6 @@
+[submodule "interface"]
+	path = interface
+	url = git@github.com:prefeiturasp/SME-plataforma-curriculo-interface.git
+[submodule "api"]
+	path = api
+	url = git@github.com:prefeiturasp/SME-plataforma-curriculo-api.git

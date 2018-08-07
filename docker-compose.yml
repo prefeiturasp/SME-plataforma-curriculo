@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+  interface:
+    build: 
+      context: ${APP_ROOT}/interface
+      args:
+        - APP_ROOT=${APP_ROOT}
+        - APP_ENV=${APP_ENV}
+    container_name: interface
+    working_dir: /app
+    ports:
+      - 5000  
+    volumes:
+      - ${APP_ROOT}/interface:/app      
+    env_file: ${APP_ROOT}/.env.interface
+    stdin_open: true
+    tty: true
+    restart: always
+
+  api:
+    build: ${APP_ROOT}/api
+    working_dir: /app
+    env_file:
+      - ${APP_ROOT}/.env.postgresql
+      - ${APP_ROOT}/.env.api
+    command: puma -v -C config/puma.rb
+    stdin_open: true
+    tty: true
+    volumes:
+      - ${APP_ROOT}/api:/app
+      - api_storage:/app/storage
+    ports:
+      - 8666
+    links:
+      - postgresql
+    depends_on:
+      - postgresql
+    restart: always
+
+  postgresql:
+    image: mdillon/postgis:10-alpine
+    ports:
+      - 5432
+    env_file: ${APP_ROOT}/.env.postgresql
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - ${APP_ROOT}/conf/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
+    restart: always
+
+  nginx:
+      image: nginx:latest
+      ports:
+        - 80:80
+      volumes:
+        - /var/run/docker.sock:/tmp/docker.sock:ro
+        - ${APP_ROOT}/conf/nginx.conf:/etc/nginx/conf.d/default.conf
+        - ${APP_ROOT}/conf/fastcgi.conf:/etc/nginx/fastcgi.conf
+        - ${APP_ROOT}/api/public:/api
+      command: [nginx-debug, '-g', 'daemon off;']
+      depends_on:
+        - api
+        - interface
+      links:
+        - api
+        - interface
+      restart: always
+
+volumes:
+  postgresql_data:
+  api_storage:
