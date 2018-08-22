@@ -38,3 +38,6 @@ run migrations <br>
 ```docker-compose exec api bundle exec rake db:migrate``` <br>
 run seeds <br>
 ```docker-compose exec api bundle exec rake db:seed```
+
+Running tests: <br>
+```docker-compose exec api bundle exec rspec```
