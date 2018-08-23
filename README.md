@@ -26,7 +26,7 @@ SECRET_KEY=secret_key
 
 rename `sample.env.interface` to `.env.interface` and add interface environment <br>
 example: <br>
-```INTERFACE_ENV=production```
+```APP_ENV=production```
 
 Build images: <br>
 ```docker-compose build```
