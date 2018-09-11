@@ -52,7 +52,7 @@ como ele está estruturado. Se você tem qualquer ideia de como podemos melhorar
 alguma abordagem na solução de problemas, refatoração de código, melhoria em
 algum recurso ou qualquer outra coisa relacionada, siga estes passos:
 
-1. Certifique-se de que sua ideia já não esteja sendo abordada dentro do conjuntos de issues [issues do GitHub](https://github.com/prefeiturasp/SME-plataforma-curriculo-interface/issues);
+1. Certifique-se de que sua ideia já não esteja sendo abordada dentro do conjuntos de issues [issues do GitHub](https://github.com/prefeiturasp/SME-plataforma-curriculo/issues);
 2. Defenda a sua ideia e explique de forma convincente porque ela deve ser
    acolhida. Eis algumas questões a considerar:
    1. Você realmente esta propondo uma ideia só ou um conjunto de ideias?
@@ -132,7 +132,7 @@ feedback da comunidade a respeito do que está sendo proposto.
 Issues que estão em processo de discussão devem receber o label **discussão**
 indicando que aquela issue precisa dos inputs e feedbacks dos membros da
 comunidade. Nós te encorajamos a participar o máximo possível mas fique atento
-ao nosso [código de conduta]() antes de realizar qualquer
+ao nosso [código de conduta](./CODEOFCONDUCT.md) antes de realizar qualquer
 interação com os outros membros da comunidade.
 
 ### Fazendo pull requests
