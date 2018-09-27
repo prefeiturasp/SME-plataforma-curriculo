@@ -43,15 +43,15 @@ nosso [código de conduta](./CODEOFCONDUCT.md).
 
 ## Instalação
 
-Application uses docker and docker compose
+Aplicativo usa docker e docker compose
 
-Config:
+Configuração:
 
 API url is at: <br>
 `interface/src/constants.js`
 
-rename `sample.env.postgresql` to `.env.postgresql` and add database config <br>
-example:
+Renomear `sample.env.postgresql` para `.env.postgresql` e adicione as configurações de database<br>
+exemplo:
 ```POSTGRES_DB=db_name
 POSTGRES_DB_TEST=test_db_name
 POSTGRES_HOST=postgresql
@@ -59,30 +59,29 @@ POSTGRES_USER=someuser
 POSTGRES_PASSWORD=somepass
 ```
 
-rename `sample.env.api` to `.env.api` and add api config <br>
-example:
+Renomear `sample.env.api` para `.env.api` e adicione as configurações de API<br>
+exemplo:
 ```RAILS_MAX_THREADS=5
 PUMA_PORT=8666
 APP_PATH=/app
 SECRET_KEY=secret_key
 ```
 
-rename `sample.env.interface` to `.env.interface` and add interface environment <br>
-example: <br>
+Renomear`sample.env.interface` para `.env.interface` e adicione o ambiente de interface<br>
+exemplo: <br>
 ```APP_ENV=production```
-
-Build images: <br>
+Construção de imagens: <br>
 ```docker-compose build```
 
-Up containers: <br>
+Subir containers: <br>
 ```docker-compose up```
 
-run migrations <br>
+Executar migrações <br>
 ```docker-compose exec api bundle exec rake db:migrate``` <br>
-run seeds <br>
+Ir para dependências<br>
 ```docker-compose exec api bundle exec rake db:seed```
 
-Running tests: <br>
+Executando testes: <br>
 ```docker-compose exec api bundle exec rspec```
 
 
