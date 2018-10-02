@@ -1,3 +1,6 @@
+Pra você que tá chegando agora e veio por conta do hacktoberfest, esse é o repositório central e as issues estão nele, mas ele é basicamente infra. O repositório em rails é esse:  [plataforma curriculo API](https://github.com/prefeiturasp/SME-plataforma-curriculo-API) issues com a tag API viram PRs nele.
+e o react é esse aqui:  [plataforma curriculo interface](https://github.com/prefeiturasp/SME-plataforma-curriculo-interface) issues com a tag interface viram PRs nele.
+
 # Pátio Digital
 
 _“Recurso público retorna ao público”._
