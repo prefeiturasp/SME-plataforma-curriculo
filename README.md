@@ -51,18 +51,19 @@ nosso [código de conduta](./CODEOFCONDUCT.md).
   a) `.env.postgresql`, com arquivo de exemplo em `sample.env.postgresql`. Nele você vai definir as configurações de banco de dados. Você pode escolher estes dados.
   b) `.env.api`, com arquivo de exemplo em `sample.env.api`. Você também pode escolher uma `SECRECT_KEY` qualquer.
   c) `.env.interface`, com arquivo de exemplo em `sample.env.interface`.
-4) Você ainda vai precisar exportar duas variáveis de ambiente, da pasta raíz deste repositório, de um terminal bash, execute
+4) Para buscar informações da API desenvolvida localmente em vez da de produção, altere o arquivo `interface/src/constants.js` para que a variável exportada `API_URL = http://0.0.0.0`
+5) Você ainda vai precisar exportar duas variáveis de ambiente, da pasta raíz deste repositório, de um terminal bash, execute
 
 ```bash
 export APP_ROOT=$(pwd)
 export APP_ENV=development " Pode ser production também
 ```
 
-5) Construa as imagens com `docker-compose build`.
-6) Suba os containers com `docker-compose up`.
-7) Acesse a aplicação em `0.0.0.0` pelo browser. A URL da API está em `interface/src/constants.js`.
-8) Execute as migrações com `docker-compose exec api bundle exec rake db:migrate`.
-9) Alimente o banco de dados com `docker-compose exec api bundle exec rake db:seed`.
+6) Construa as imagens com `docker-compose build`.
+7) Suba os containers com `docker-compose up`.
+8) Acesse a aplicação em `0.0.0.0` pelo browser.
+9) Execute as migrações com `docker-compose exec api bundle exec rake db:migrate`.
+10) Alimente o banco de dados com `docker-compose exec api bundle exec rake db:seed`.
 
 ## Testando
 
