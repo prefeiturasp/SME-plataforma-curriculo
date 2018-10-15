@@ -43,50 +43,33 @@ onde explicamos detalhadamente como trabalhamos e de que formas você pode nos
 ajudar a alcançar nossos objetivos. Lembrando que todos devem seguir 
 nosso [código de conduta](./CODEOFCONDUCT.md).
 
-
 ## Instalação
 
-Aplicativo usa docker e docker compose
+1) Clone este repositório, entre na pasta e rode `git submodule init` e `git submodule update` para clonar também os outros repositórios envolvidos no projeto.
+2) [Instale](https://docs.docker.com/compose/install/) `docker` e `docker compose`.
+3) Existem 3 arquivos de ambiente que devem ser configurados.  
+  a) `.env.postgresql`, com arquivo de exemplo em `sample.env.postgresql`. Nele você vai definir as configurações de banco de dados. Você pode escolher estes dados.
+  b) `.env.api`, com arquivo de exemplo em `sample.env.api`. Você também pode escolher uma `SECRECT_KEY` qualquer.
+  c) `.env.interface`, com arquivo de exemplo em `sample.env.interface`.
+4) Para buscar informações da API desenvolvida localmente em vez da de produção, altere o arquivo `interface/src/constants.js` para que a variável exportada `API_URL = http://0.0.0.0`
+5) Você ainda vai precisar exportar duas variáveis de ambiente, da pasta raíz deste repositório, de um terminal bash, execute
 
-Configuração:
-
-API url is at: <br>
-`interface/src/constants.js`
-
-Renomear `sample.env.postgresql` para `.env.postgresql` e adicione as configurações de database<br>
-exemplo:
-```POSTGRES_DB=db_name
-POSTGRES_DB_TEST=test_db_name
-POSTGRES_HOST=postgresql
-POSTGRES_USER=someuser
-POSTGRES_PASSWORD=somepass
+```bash
+export APP_ROOT=$(pwd)
+export APP_ENV=development " Pode ser production também
 ```
 
-Renomear `sample.env.api` para `.env.api` e adicione as configurações de API<br>
-exemplo:
-```RAILS_MAX_THREADS=5
-PUMA_PORT=8666
-APP_PATH=/app
-SECRET_KEY=secret_key
-```
+6) Construa as imagens com `docker-compose build`.
+7) Suba os containers com `docker-compose up`.
+8) Acesse a aplicação em `0.0.0.0` pelo browser.
+9) Execute as migrações com `docker-compose exec api bundle exec rake db:migrate`.
+10) Alimente o banco de dados com `docker-compose exec api bundle exec rake db:seed`.
 
-Renomear`sample.env.interface` para `.env.interface` e adicione o ambiente de interface<br>
-exemplo: <br>
-```APP_ENV=production```
-Construção de imagens: <br>
-```docker-compose build```
+## Testando
 
-Subir containers: <br>
-```docker-compose up```
+Os testes são feitos com `rspec` que é instalado no container do `docker`. Para rodar os testes:
 
-Executar migrações <br>
-```docker-compose exec api bundle exec rake db:migrate``` <br>
-Ir para dependências<br>
-```docker-compose exec api bundle exec rake db:seed```
-
-Executando testes: <br>
 ```docker-compose exec api bundle exec rspec```
-
 
 ---
 
