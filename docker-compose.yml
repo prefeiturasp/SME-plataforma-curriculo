@@ -10,10 +10,8 @@ services:
     container_name: interface
     working_dir: /app
     ports:
-      - 5000  
-    volumes:
-      - ${APP_ROOT}/interface:/app      
-    env_file: ${APP_ROOT}/.env.interface
+      - 5000        
+    env_file: .env.interface
     stdin_open: true
     tty: true
     restart: always
