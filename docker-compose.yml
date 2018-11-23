@@ -3,7 +3,7 @@ version: '3'
 services:
   interface:
     build: 
-      context: ${APP_ROOT}/interface
+      context: ./interface
       args:
         - APP_ROOT=${APP_ROOT}
         - APP_ENV=${APP_ENV}
