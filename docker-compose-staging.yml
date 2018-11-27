@@ -9,6 +9,3 @@ services:
 
   nginx:
     image: registry.curriculo.jurema.la:443/nginx
-
-  postgresql:
-    image: registry.curriculo.jurema.la:443/postgresql
