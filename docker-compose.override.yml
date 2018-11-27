@@ -4,7 +4,13 @@ services:
   interface:
     volumes:
       - ./interface:/app
+    ports:
+      - 5000
+    args:
+      - APP_ENV=development
 
   api:
     volumes:
       - ./api:/app
+    ports: 
+      - 8666

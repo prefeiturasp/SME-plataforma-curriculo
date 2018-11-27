@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  interface:
+    image: registry.curriculo.jurema.la:443/interface
+
+  api:
+    image: registry.curriculo.jurema.la:443/api
+
+  nginx:
+    image: registry.curriculo.jurema.la:443/nginx
+
+  postgresql:
+    image: registry.curriculo.jurema.la:443/postgresql

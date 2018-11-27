@@ -2,21 +2,19 @@ version: '3'
 
 services:
   interface:
+    container_name: interface
     build: 
       context: ./interface
       args:
-        - APP_ROOT=${APP_ROOT}
-        - APP_ENV=${APP_ENV}
-    container_name: interface
-    working_dir: /app
-    ports:
-      - 5000        
+        - APP_ENV=production
+    working_dir: /app       
     env_file: .env.interface
     stdin_open: true
     tty: true
     restart: always
 
   api:
+    container_name: api
     build: ./api
     working_dir: /app
     env_file:
@@ -27,8 +25,6 @@ services:
     tty: true
     volumes:
       - api_storage:/app/storage
-    ports:
-      - 8666
     links:
       - postgresql
     depends_on:
@@ -36,6 +32,7 @@ services:
     restart: always
 
   postgresql:
+    container_name: postgresql
     image: mdillon/postgis:10-alpine
     ports:
       - 5432
@@ -46,6 +43,7 @@ services:
     restart: always
 
   nginx:
+      container_name: nginx
       build: 
         context: .
         dockerfile: ./conf/nginx/Dockerfile
