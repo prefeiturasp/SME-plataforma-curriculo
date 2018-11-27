@@ -7,7 +7,7 @@ services:
       context: ./interface
       args:
         - APP_ENV=production
-    working_dir: /app       
+        - API_URL=http://curriculo.prefeitura.sp.gov.br
     env_file: .env.interface
     stdin_open: true
     tty: true
@@ -16,7 +16,6 @@ services:
   api:
     container_name: api
     build: ./api
-    working_dir: /app
     env_file:
       - ./.env.postgresql
       - ./.env.api
