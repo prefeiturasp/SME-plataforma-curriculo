@@ -10,14 +10,11 @@ steps:
   commands:
   - git submodule update --recursive --remote
 
-- name: test
-  image: ruby
+- name: build
+  image: rubyplugins/docker
   commands:
-  - bundle install --jobs=3 --retry=3
-  - rake
+  - docker-compose -f docker-compose.yml docker-compose-staging.yml pull
   when:
     branch:
     - devops
-    - master
-    - mvp2
-    - staging
+
