@@ -12,6 +12,9 @@ steps:
 
 - name: build
   image: tmaier/docker-compose:latest
+  volumes:
+    - name: dockersock
+    path: /var/run/docker.sock
   commands:
     - docker info
     - docker-compose --version
@@ -19,4 +22,9 @@ steps:
   when:
     branch:
     - devops
+
+volumes:
+- name: dockersock
+  host:
+    path: /var/run/docker.sock
 
