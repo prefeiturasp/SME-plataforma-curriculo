@@ -13,7 +13,7 @@ steps:
 - name: build
   image: tmaier/docker-compose:latest
   volumes:
-    - name: dockersock
+    name: dockersock
     path: /var/run/docker.sock
   commands:
     - docker info
@@ -24,7 +24,7 @@ steps:
     - devops
 
 volumes:
-- name: dockersock
+  name: dockersock
   host:
     path: /var/run/docker.sock
 
