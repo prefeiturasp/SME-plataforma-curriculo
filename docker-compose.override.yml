@@ -6,7 +6,7 @@ services:
       - ./interface:/app
     ports:
       - 5000
-    args:
+    environment:
       - APP_ENV=development
 
   api:
