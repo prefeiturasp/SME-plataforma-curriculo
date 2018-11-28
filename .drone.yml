@@ -19,3 +19,4 @@ steps:
     branch:
     - devops
     - master
+    - mvp2
