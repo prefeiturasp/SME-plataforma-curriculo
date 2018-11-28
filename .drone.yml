@@ -13,7 +13,7 @@ steps:
 - name: build
   image: tmaier/docker-compose:latest
   commands:
-    - docker-compose -f docker-compose.yml docker-compose-staging.yml build
+    - docker-compose -f docker-compose.yml -f docker-compose-staging.yml build
   when:
     branch:
     - devops
