@@ -11,7 +11,7 @@ steps:
   - git submodule update --recursive --remote
 
 - name: build
-  image: rubyplugins/docker
+  image: plugins/docker
   commands:
   - docker-compose -f docker-compose.yml docker-compose-staging.yml pull
   when:
