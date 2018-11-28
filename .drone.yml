@@ -18,3 +18,4 @@ steps:
   when:
     branch:
     - devops
+    - master
