@@ -9,3 +9,9 @@ steps:
   image: docker:git
   commands:
   - git submodule update --recursive --remote
+
+- name: test
+  image: ruby
+  commands:
+  - bundle install --jobs=3 --retry=3
+  - rake
