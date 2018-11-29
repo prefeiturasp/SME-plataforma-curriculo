@@ -2,14 +2,14 @@ version: '3'
 
 services:
   interface:
-    image: registry.curriculo.jurema.la:443/interface
+    image: registry.curriculo.jurema.la/interface
     build: 
           context: ./interface
           args:
             - APP_ENV=production
             - API_URL=http://curriculo.jurema.la
   api:
-    image: registry.curriculo.jurema.la:443/api
+    image: registry.curriculo.jurema.la/api
 
   nginx:
-    image: registry.curriculo.jurema.la:443/nginx
+    image: registry.curriculo.jurema.la/nginx
