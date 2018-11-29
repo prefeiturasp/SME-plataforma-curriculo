@@ -8,8 +8,7 @@ services:
       args:
         - APP_ENV=production
         - API_URL=http://curriculo.prefeitura.sp.gov.br
-    environment:
-        - NPM_CONFIG_LOGLEVEL=${NPM_CONFIG_LOGLEVEL}
+    env_file: .env.interface
     stdin_open: true
     tty: true
     restart: always
@@ -17,18 +16,9 @@ services:
   api:
     container_name: api
     build: ./api
-    environment:
-      - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_MULTIPLE_DATABASES}
-      - POSTGRES_DB_TEST=${POSTGRES_DB_TEST}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - RAILS_MAX_THREADS=${RAILS_MAX_THREADS}
-      - PUMA_PORT=${PUMA_PORT}
-      - APP_PATH=${APP_PATH}
-      - SECRET_KEY=${SECRET_KEY}
-      - RAILS_ENV=${RAILS_ENV}
+    env_file:
+      - ./.env.postgresql
+      - ./.env.api
     command: puma -v -C config/puma.rb
     stdin_open: true
     tty: true
@@ -45,13 +35,7 @@ services:
     image: mdillon/postgis:10-alpine
     ports:
       - 5432
-    environment:
-      - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_MULTIPLE_DATABASES}
-      - POSTGRES_DB_TEST=${POSTGRES_DB_TEST}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_PORT=${POSTGRES_PORT}
+    env_file: ./.env.postgresql
     volumes:
       - postgresql_data:/var/lib/postgresql/data
       - ./conf/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh

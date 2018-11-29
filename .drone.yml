@@ -5,26 +5,18 @@ clone:
   depth: 50
 
 steps:
-- name: submodules
-  image: docker:git
-  commands:
-    - git submodule update --recursive --remote
+- name: interface
+  image: plugins/docker
+  build_args:
+      - APP_ENV=production
+  settings:
+    repo: registry.curriculo.jurema.la/interface
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    registry: registry.curriculo.jurema.la
+    dockerfile: ./interface/Dockerfile
+    context: ./interface
 
-- name: build
-  image: tmaier/docker-compose:latest
-  volumes:
-    name: dockersock
-    path: /var/run/docker.sock
-  commands:
-    - docker info
-    - docker-compose --version
-    - docker-compose -f docker-compose.yml -f docker-compose-staging.yml build
-  when:
-    branch:
-    - devops
-
-volumes:
-  name: dockersock
-  host:
-    path: /var/run/docker.sock
 
