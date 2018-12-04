@@ -19,7 +19,6 @@ services:
     env_file:
       - ./.env.postgresql
       - ./.env.api
-    command: puma -v -C config/puma.rb
     stdin_open: true
     tty: true
     volumes:
