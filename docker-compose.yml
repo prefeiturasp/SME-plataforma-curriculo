@@ -45,7 +45,7 @@ services:
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
-    env_file: ${APP_ROOT}/.env.elasticsearch
+    env_file: ./.env.elasticsearch
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
