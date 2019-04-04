@@ -1,13 +1,16 @@
 version: '3'
 
 services:
+
   interface:
     container_name: interface
     build: 
       context: ./interface
       args:
         - APP_ENV=production
-        - API_URL=http://curriculo.prefeitura.sp.gov.br
+        - API_URL=http://0.0.0.0
+    networks:
+      - frontend
     env_file: .env.interface
     stdin_open: true
     tty: true
@@ -29,6 +32,8 @@ services:
     depends_on:
       - postgresql
       - elasticsearch
+    networks:
+      - backend
     restart: always
 
   postgresql:
@@ -36,6 +41,8 @@ services:
     image: mdillon/postgis:10-alpine
     ports:
       - 5432
+    networks:
+      - backend
     env_file: ./.env.postgresql
     volumes:
       - postgresql_data:/var/lib/postgresql/data
@@ -50,6 +57,8 @@ services:
       - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+    networks:
+      - backend
     restart: always
 
   nginx:
@@ -59,6 +68,9 @@ services:
       dockerfile: ./conf/nginx/Dockerfile
     ports:
       - 80:80
+    networks:
+      - frontend
+      - backend
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
     command: [nginx-debug, '-g', 'daemon off;']
@@ -74,11 +86,7 @@ volumes:
   postgresql_data:
   api_storage:
   elasticsearch_data:
-    
+
 networks:
-  default:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.0.1.0/24
+  frontend:
+  backend:

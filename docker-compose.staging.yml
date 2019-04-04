@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+
+  interface:
+    image: registry.curriculo.jurema.la/interface:latest
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  api:
+    image: registry.curriculo.jurema.la/api:latest
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 2
+        delay: 30s
+      restart_policy:
+        condition: on-failure
+
+  postgresql:
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  elasticsearch:
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  nginx:
+    image: registry.curriculo.jurema.la/nginx:latest
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - 8088:8080
+    stop_grace_period: 1m30s
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints: [node.role == manager]
