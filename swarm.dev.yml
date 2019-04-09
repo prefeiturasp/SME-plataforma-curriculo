@@ -1,0 +1,141 @@
+version: '3.6'
+
+services:
+
+  interface:
+    image: registry:5000/interface
+    container_name: interface
+    env_file: .env.interface
+    build: 
+      context: ./interface
+      args:
+        - APP_ENV=production
+        - API_URL=http://0.0.0.0
+    networks:
+      - frontend
+    stdin_open: true
+    tty: true
+    restart: always
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  api:
+    image: registry:5000/api
+    container_name: api
+    env_file:
+      - ./.env.postgresql
+      - ./.env.api
+    build: ./api
+    stdin_open: true
+    tty: true
+    volumes:
+      - api_storage:/app/storage
+    links:
+      - postgresql
+      - elasticsearch
+    depends_on:
+      - postgresql
+      - elasticsearch
+    networks:
+      - backend
+    restart: always
+    secrets:
+      - POSTGRES_PASSWORD
+      - SECRET_KEY
+      - DEVISE_JWT_SECRET_KEY
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 2
+        delay: 30s
+      restart_policy:
+        condition: on-failure
+
+  postgresql:
+    image: registry:5000/database
+    container_name: postgresql
+    env_file: ./.env.postgresql
+    build:
+      context: .
+      dockerfile: ./conf/postgresql/Dockerfile
+    ports:
+      - 5432
+    networks:
+      - backend
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    restart: always
+    secrets:
+      - POSTGRES_PASSWORD
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    env_file: ./.env.elasticsearch
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - backend
+    restart: always
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  nginx:
+    image: registry:5000/webserver
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: ./conf/nginx/Dockerfile
+    ports:
+      - 80:80
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    command: [nginx-debug, '-g', 'daemon off;']
+    depends_on:
+      - api
+      - interface
+    links:
+      - api
+      - interface
+    restart: always
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - 8088:8080
+    stop_grace_period: 1m30s
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+volumes:
+  postgresql_data:
+  api_storage:
+  elasticsearch_data:
+
+networks:
+  frontend:
+  backend:
+
+secrets:
+  SECRET_KEY:
+    external: true
+  DEVISE_JWT_SECRET_KEY:
+    external: true
+  POSTGRES_PASSWORD:
+    external: true
