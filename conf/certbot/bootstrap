@@ -1,0 +1,52 @@
+#!/bin/sh
+
+trap exit TERM
+
+root_path=/etc/letsencrypt/
+
+link_certs () {
+  echo -e "\n[i] linking letsencrypt certificates\n"
+  ln -sf $(readlink -f ${root_path}live/${DOMAIN}/fullchain.pem) ${root_path}certs/fullchain.pem
+  ln -sf $(readlink -f ${root_path}live/${DOMAIN}/privkey.pem)   ${root_path}certs/privkey.pem
+}
+
+[ -f ${root_path}.exists ] || {
+  certbot_git=https://raw.githubusercontent.com/certbot/certbot/master/
+
+  mkdir -p ${root_path}conf
+  mkdir -p ${root_path}www
+  mkdir -p ${root_path}certs
+
+  echo -e "\n[i] generating dhparams\n"
+  openssl dhparam -out ${root_path}conf/ssl-dhparams.pem 2048
+
+  echo -e "\n[i] making temporary ssl certs\n"
+  openssl req -x509 -nodes -newkey rsa:1024 -days 1 \
+    -keyout ${root_path}certs/privkey.pem -out ${root_path}certs/fullchain.pem -subj '/CN=localhost'
+
+  touch ${root_path}.exists
+
+  echo -e "\n[i] waiting 2 minutes to nginx wake up\n"
+  sleep 2m
+
+  email_arg="--register-unsafely-without-email"
+  [ -z "$EMAIL" ] || email_arg="--email $EMAIL"
+
+  echo -e "\n[i] generating letsencrypt certificates\n"
+  certbot certonly --webroot -w ${root_path}www -d $DOMAIN $email_arg --agree-tos --force-renewal
+
+  echo -e "\n[i] removing temporary certificates and replace with letsencrypt ones\n"
+  rm ${root_path}certs/privkey.pem
+  rm ${root_path}certs/fullchain.pem
+
+  link_certs
+
+  echo -e "\n[i] everything should be fine now\n"
+  sleep 12h
+}
+
+while :; do
+  certbot renew
+  link_certs
+  sleep 12h & wait ${!}
+done

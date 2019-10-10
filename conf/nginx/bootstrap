@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# reload once in a while, in case certificates are renewed
+while :; do
+  sleep 6h & wait ${!}
+
+  nginx-debug -s reload
+done &
+
+# wait for certificates to be ready, if coupled with certbot
+[ -d /etc/letsencrypt ] && {
+  [ -f /etc/letsencrypt/.exists ] || {
+    echo "\n[i] waiting for certbot to create temporary certificates"
+
+    (
+      sleep 12m
+      echo "\n[i] quick reload to load letsencrypt certificates\n"
+      nginx-debug -s reload
+    ) &
+  }
+
+  while [ ! -f /etc/letsencrypt/.exists ]; do
+    sleep 10
+  done
+}
+
+echo "\n[i] starting nginx\n"
+nginx-debug -g 'daemon off;'
