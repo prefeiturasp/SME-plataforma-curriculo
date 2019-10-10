@@ -1,3 +1,5 @@
+node_modules
+conf/jwt/node_modules
 .env*
 .sw*
 .DStore

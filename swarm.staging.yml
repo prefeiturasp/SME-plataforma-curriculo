@@ -24,8 +24,8 @@ services:
     image: registry.curriculo.jurema.la/api:latest
     container_name: api
     env_file:
-      - ./.env.postgresql
-      - ./.env.api
+      - .env.postgresql
+      - .env.api.dev
     build: ./api
     stdin_open: true
     tty: true
@@ -34,9 +34,11 @@ services:
     links:
       - postgresql
       - elasticsearch
+      - jwt
     depends_on:
       - postgresql
       - elasticsearch
+      - jwt
     networks:
       - backend
     restart: always
@@ -55,7 +57,7 @@ services:
   postgresql:
     image: registry.curriculo.jurema.la/database:latest
     container_name: postgresql
-    env_file: ./.env.postgresql
+    env_file: .env.postgresql
     build:
       context: .
       dockerfile: ./conf/postgresql/Dockerfile
@@ -75,7 +77,7 @@ services:
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
-    env_file: ./.env.elasticsearch
+    env_file: .env.elasticsearch
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
@@ -95,18 +97,41 @@ services:
       dockerfile: ./conf/nginx/Dockerfile
     ports:
       - 80:80
+      - 443:443
     networks:
       - frontend
       - backend
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    command: [nginx-debug, '-g', 'daemon off;']
+      - certbot_data:/etc/letsencrypt
+#volumes:
+#- /var/run/docker.sock:/tmp/docker.sock:ro
+#    command: [nginx-debug, '-g', 'daemon off;']
     depends_on:
       - api
       - interface
+      - certbot
     links:
       - api
       - interface
+      - certbot
+    restart: always
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  certbot:
+    image: registry.curriculo.jurema.la/certbot:latest
+    container_name: certbot
+    build:
+      context: .
+      dockerfile: ./conf/certbot/Dockerfile
+    environment:
+      - DOMAIN=curriculo.jurema.la
+      - EMAIL=dev@jurema.la
+    networks:
+      - backend
+    volumes:
+      - certbot_data:/etc/letsencrypt
     restart: always
     deploy:
       placement:
@@ -123,10 +148,28 @@ services:
       placement:
         constraints: [node.role == manager]
 
+  jwt:
+    image: registry.curriculo.jurema.la/jwt:latest
+    container_name: jwt
+    build: ./conf/jwt
+    ports:
+      - 8082:8082
+    networks:
+      - backend
+    env_file: .env.api.dev
+    stdin_open: true
+    tty: true
+    restart: always
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+
 volumes:
   postgresql_data:
   api_storage:
   elasticsearch_data:
+  certbot_data:
 
 networks:
   frontend:
