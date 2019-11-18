@@ -1,4 +1,4 @@
-version: '3'
+version: '3.1'
 
 services:
 
@@ -18,41 +18,48 @@ services:
 
   api:
     container_name: api
-    build: ./api
+    build:
+      context: ./api
+      dockerfile: config/docker/Dockerfile
+    command: bundle exec puma -v -C config/puma.rb &; bash
     env_file:
-      - ./.env.postgresql
-      - ./.env.api
+      - ./.env.postgresql.dev
+      - ./.env.api.dev
     stdin_open: true
     tty: true
     volumes:
       - api_storage:/app/storage
+      - ./api:/app
     links:
       - postgresql
       - elasticsearch
+      - jwt
     depends_on:
       - postgresql
       - elasticsearch
     networks:
       - backend
+      - bridge
     restart: always
 
   postgresql:
     container_name: postgresql
-    image: mdillon/postgis:10-alpine
+    build:
+      context: .
+      dockerfile: ./conf/postgresql/Dockerfile
     ports:
       - 5432
     networks:
       - backend
-    env_file: ./.env.postgresql
+    env_file: .env.postgresql.dev
     volumes:
       - postgresql_data:/var/lib/postgresql/data
-      - ./conf/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
     restart: always
 
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
-    env_file: ./.env.elasticsearch
+    env_file: .env.elasticsearch
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
@@ -71,6 +78,7 @@ services:
     networks:
       - frontend
       - backend
+      - bridge
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
     command: [nginx-debug, '-g', 'daemon off;']
@@ -82,6 +90,20 @@ services:
       - interface
     restart: always
 
+  jwt:
+    container_name: jwt
+    build: ./conf/jwt
+    ports:
+      - 8082:8082
+    networks:
+      - backend
+    env_file:
+      - ./.env.api.dev
+    volumes:
+      - ./conf/jwt/:/usr/src/app
+    stdin_open: true
+    tty: true
+
 volumes:
   postgresql_data:
   api_storage:
@@ -90,3 +112,9 @@ volumes:
 networks:
   frontend:
   backend:
+  bridge:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.1.0/24

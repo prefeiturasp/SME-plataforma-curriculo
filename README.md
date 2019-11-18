@@ -14,7 +14,9 @@ Nós somos o **pátio digital**, uma iniciativa da Secretaria Municipal de Educa
 1. [Sobre o curriculo digital](#sobre-o-curriculo-digital)
 2. [Comunicação](#comunicação)
 3. [Como contribuir](#como-contribuir)
-4. [Instalação](#instalação)
+4. [Instalação Local](#instalação-local-desenvolvimento)
+5. [Instalação Remota](#instalação-remota-produção)
+6. [Deploy](#deploy)
 
 
 ## Sobre o Curriculo Digital
@@ -43,7 +45,7 @@ onde explicamos detalhadamente como trabalhamos e de que formas você pode nos
 ajudar a alcançar nossos objetivos. Lembrando que todos devem seguir 
 nosso [código de conduta](./CODEOFCONDUCT.md).
 
-## Instalação
+## Instalação Local (desenvolvimento)
 
 1) Clone este repositório, entre na pasta e rode `git submodule init` e `git submodule update` para clonar também os outros repositórios envolvidos no projeto.
 2) [Instale](https://docs.docker.com/compose/install/) `docker` e `docker compose`.
@@ -64,6 +66,42 @@ export APP_ENV=development " Pode ser production também
 8) Acesse a aplicação em `0.0.0.0` pelo browser.
 9) Execute as migrações com `docker-compose exec api bundle exec rake db:migrate`.
 10) Alimente o banco de dados com `docker-compose exec api bundle exec rake db:seed`.
+
+## Instalação remota (produção)
+
+1) Usando o projeto [openconnect](https://github.com/dlenski/openconnect) com suporte ao "palo alto globalprotect" é possivel conectar a vpn da pmsp com o comando:
+```sh
+$ sudo openconnect --protocol=gp vpn1.sme.prefeitura.sp.gov.br -u usuariovpn --servercert pin-sha256:tshIkwa9zrqyIwxzcH+KbtEE0YnsYijhHM1nVCI0Moo=
+```
+2) Conectar com o servidor interno no ip `10.50.0.147` com o usuario ssh forcenido pela prefeitura `ssh usuariossh@10.50.0.147`.
+3) Criar swarm em produção:
+```sh
+$ sudo docker swarm init
+> docker swarm join --token SWMTKN-1-5chx61bfz2e5e36alhzzv8sffz00080rrpp7bee8m2r15ytx9g-7vaym1i50bzh75f28rsgg53ab 10.50.0.147:2377
+```
+4) Se houver mais de um servidor remoto pode se utilizar o comando fornecido acima para conectar varias maquinas e criar um load-balancer.
+5) Criar secrets que serão usados pelos containers, os secrets estão listados no final do arquivo `swarm.production.yml`, para criar um: `print "senhadopostgresql" | docker secret create POSTGRES_PASSWORD -`.
+6) Fazer login no `registry` da prefeitura, isso evita problemas ao publicar os containers na etapa de deploy: `docker login -u usuarioregistry -p senharegistry registry.sme.prefeitura.sp.gov.br`.
+
+## Deploy
+
+1) Conectar a VPN usando [openconnect](https://github.com/dlenski/openconnect):
+```sh
+$ sudo openconnect --protocol=gp vpn1.sme.prefeitura.sp.gov.br -u usuariovpn --servercert pin-sha256:tshIkwa9zrqyIwxzcH+KbtEE0YnsYijhHM1nVCI0Moo=
+```
+2) Se houver mudança na API, Interface ou qualquer outro projeto faça a geração de novas imagens e publique no `registry` da prefeitura:
+     a) Gerar todas as imagens `docker-compose -f swarm.production.yml build` ou gerar somente a imagem de um projeto `docker-compose -f swarm.production.yml build api`.
+     b) Verifique se esta autenticado com o `registry` da prefeitura, se não faça o login usando `docker login -u usuarioregistry -p senharegistry registry.sme.prefeitura.sp.gov.br`.
+     c) Publicar imagens no `registry` da prefeitura `docker push registry.sme.prefeitura.sp.gov.br/curriculo/interface:latest`, faça isso para cada imagem alterada.
+3) Criar tunnel SSH e expor docker host:
+```sh
+$ ssh -p 22 -fNL localhost:2374:/var/run/docker.sock usuariossh@10.50.0.147
+$ export DOCKER_HOST=tcp://localhost:2374
+```
+4) Deploy é feito pelo comando:
+```sh
+$ docker stack deploy -c swarm.production.yml curriculum --with-registry-auth
+```
 
 ## Testando
 
