@@ -90,9 +90,13 @@ $ sudo docker swarm init
 $ sudo openconnect --protocol=gp vpn1.sme.prefeitura.sp.gov.br -u usuariovpn --servercert pin-sha256:tshIkwa9zrqyIwxzcH+KbtEE0YnsYijhHM1nVCI0Moo=
 ```
 2) Se houver mudança na API, Interface ou qualquer outro projeto faça a geração de novas imagens e publique no `registry` da prefeitura:
+
      a) Gerar todas as imagens `docker-compose -f swarm.production.yml build` ou gerar somente a imagem de um projeto `docker-compose -f swarm.production.yml build api`.
+
      b) Verifique se esta autenticado com o `registry` da prefeitura, se não faça o login usando `docker login -u usuarioregistry -p senharegistry registry.sme.prefeitura.sp.gov.br`.
+
      c) Publicar imagens no `registry` da prefeitura `docker push registry.sme.prefeitura.sp.gov.br/curriculo/interface:latest`, faça isso para cada imagem alterada.
+
 3) Criar tunnel SSH e expor docker host:
 ```sh
 $ ssh -p 22 -fNL localhost:2374:/var/run/docker.sock usuariossh@10.50.0.147
