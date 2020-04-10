@@ -9,7 +9,7 @@ services:
       context: ./interface
       args:
         - APP_ENV=production
-        - API_URL=http://0.0.0.0 #change to you ULR
+        - API_URL=0.0.0.0 #change to you ULR
     networks:
       - frontend
     env_file: .env.interface
