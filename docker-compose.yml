@@ -1,14 +1,15 @@
-version: '3.1'
+version: '3.6'
 
 services:
 
   interface:
+    image: registry.sme.prefeitura.sp.gov.br/curriculo/interface
     container_name: interface
-    build: 
+    build:
       context: ./interface
       args:
         - APP_ENV=production
-        - API_URL=http://0.0.0.0
+        - API_URL=http://0.0.0.0 #change to you ULR
     networks:
       - frontend
     env_file: .env.interface
@@ -17,14 +18,14 @@ services:
     restart: always
 
   api:
+    image: registry.sme.prefeitura.sp.gov.br/curriculo/api
     container_name: api
     build:
       context: ./api
       dockerfile: config/docker/Dockerfile
-    command: bundle exec puma -v -C config/puma.rb &; bash
     env_file:
-      - ./.env.postgresql.dev
-      - ./.env.api.dev
+      - ./.env.postgresql
+      - ./.env.api
     stdin_open: true
     tty: true
     volumes:
@@ -33,7 +34,6 @@ services:
     links:
       - postgresql
       - elasticsearch
-      - jwt
     depends_on:
       - postgresql
       - elasticsearch
@@ -43,6 +43,7 @@ services:
     restart: always
 
   postgresql:
+    image: registry.sme.prefeitura.sp.gov.br/curriculo/database
     container_name: postgresql
     build:
       context: .
@@ -51,7 +52,7 @@ services:
       - 5432
     networks:
       - backend
-    env_file: .env.postgresql.dev
+    env_file: ./.env.postgresql
     volumes:
       - postgresql_data:/var/lib/postgresql/data
     restart: always
@@ -59,7 +60,7 @@ services:
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
-    env_file: .env.elasticsearch
+    env_file: ./.env.elasticsearch
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
@@ -69,6 +70,7 @@ services:
     restart: always
 
   nginx:
+    image: registry.sme.prefeitura.sp.gov.br/curriculo/nginx
     container_name: nginx
     build:
       context: .
@@ -89,20 +91,6 @@ services:
       - api
       - interface
     restart: always
-
-  jwt:
-    container_name: jwt
-    build: ./conf/jwt
-    ports:
-      - 8082:8082
-    networks:
-      - backend
-    env_file:
-      - ./.env.api.dev
-    volumes:
-      - ./conf/jwt/:/usr/src/app
-    stdin_open: true
-    tty: true
 
 volumes:
   postgresql_data:

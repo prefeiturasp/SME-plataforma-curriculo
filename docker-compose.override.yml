@@ -1,4 +1,4 @@
-version: '3'
+version: '3.6'
 
 services:
   interface:
@@ -12,5 +12,5 @@ services:
   api:
     volumes:
       - ./api:/app
-    ports: 
+    ports:
       - 8666
