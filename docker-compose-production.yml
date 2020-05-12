@@ -1,0 +1,120 @@
+version: '3.6'
+
+services:
+
+  interface:
+    image: registry.sme.prefeitura.sp.gov.br/curriculo/interface
+    container_name: interface
+    build:
+      context: ./interface
+      args:
+        - APP_ENV=production
+        - API_URL=curriculo.sme.prefeitura.sp.gov.br #change to you ULR
+    networks:
+      - frontend
+    env_file: .env.interface
+    stdin_open: true
+    tty: true
+    restart: always
+
+  api:
+    image: registry.sme.prefeitura.sp.gov.br/curriculo/api
+    container_name: api
+    build:
+      context: ./api
+      dockerfile: config/docker/Dockerfile
+    env_file:
+      - ./.env.postgresql
+      - ./.env.api
+    stdin_open: true
+    tty: true
+    volumes:
+      - api_storage:/app/storage
+      - ./api:/app
+    links:
+      - postgresql
+      - elasticsearch
+    depends_on:
+      - postgresql
+      - elasticsearch
+    networks:
+      - backend
+      - bridge
+    restart: always
+
+  postgresql:
+    image: registry.sme.prefeitura.sp.gov.br/curriculo/database
+    container_name: postgresql
+    build:
+      context: .
+      dockerfile: ./conf/postgresql/Dockerfile
+    ports:
+      - 5432
+    networks:
+      - backend
+    env_file: ./.env.postgresql
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    restart: always
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    env_file: ./.env.elasticsearch
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - backend
+    restart: always
+
+  nginx:
+    image: registry.sme.prefeitura.sp.gov.br/curriculo/nginx
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: ./conf/nginx/Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - frontend
+      - backend
+      - bridge
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    command: [nginx-debug, '-g', 'daemon off;']
+    depends_on:
+      - api
+      - interface
+    links:
+      - api
+      - interface
+      - certbot
+    restart: always
+
+  certbot:
+    image: certbot/certbot
+    restart: always
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  postgresql_data:
+  api_storage:
+  elasticsearch_data:
+
+networks:
+  frontend:
+  backend:
+  bridge:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.1.0/24
