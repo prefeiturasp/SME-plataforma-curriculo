@@ -55,20 +55,13 @@ O Nosso produto **garante apoio ao processo de colaboração entre os professore
 
 ## [](#sobre-o-time)Sobre o Time:
 
-| Papel | Titular | Suplente
-
+| Papel | Titular | Suplente|
 |--|--|--|
-
 | Product Owner | Heloisa Moraes e Lisandra Paes|  - |
-
 | Agente de Governança | @VitorFerragini | Gabriela Rowlands |
-
 | Gerente de Projeto | Aline Freitas | |
-
 | Scrum Master | Augusto Silva |  |
-
 | Designer de Serviços | @cintiafabi |@caiodibdeseixas |
-
 | Analista Programador | Rodolpho Azeredo |  |
 
 ## [](#sobre-o-produto)Sobre o Produto
